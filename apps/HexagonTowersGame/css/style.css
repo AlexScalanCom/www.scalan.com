@@ -1,0 +1,57 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Oct 1, 2016, 8:23:00 PM
+    Author     : SnailDog
+*/
+body{
+    padding: 0px;
+    margin: 0px;
+    background-color: #EDEDED;
+}
+.head{
+    background-color: #333333;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    margin-bottom: 10px;
+    font-family: Georgia;
+    color: #EDEDED;
+    min-height: 42px;
+}
+.input{
+    text-decoration: none;
+    color: black;
+    font-size: 27px;
+}
+.a{
+    text-decoration: none;
+    color: black;
+    font-size: 30px;
+}
+.a:hover{
+    text-decoration: none;
+    color: #666666;
+}
+table{
+    width: 100%;
+    margin-bottom: 15px;
+    margin-top: 15px;
+    text-align: center;
+}
+
+.form {
+    margin-top: 10%;
+    max-width: 550px;
+    padding: 15px;
+    opacity: 0.7;
+    font-family: fantasy;
+    text-align: center;
+    box-shadow: 0 0 10px rgba(0,0,0,0.6);
+}
+.form:hover{
+    max-width: 552px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.5);
+}
+

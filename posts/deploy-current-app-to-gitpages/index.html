@@ -1,0 +1,61 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/png" href="/favicon.png"><link rel="stylesheet" href="https://unpkg.com/prismjs@1.20.0/themes/prism-okaidia.css"/><link rel="stylesheet" type="text/css" href="/static/css/tailwind.css"/><title>Deploy current app to gitpages</title></head><body class="m-0 p-0"><a name="top"></a><header class="site-header"><nav class="site-nav"><a href="/" class="site-logo">scalan.com</a> <input type="checkbox" id="menu-toggle" class="menu-toggle__input"/> <label for="menu-toggle" class="menu-toggle" aria-label="Open navigation menu"><span class="menu-toggle__bar"></span> <span class="menu-toggle__bar"></span> <span class="menu-toggle__bar"></span></label><ul class="site-menu"><li class="site-menu__item"><a href="/" class="site-menu__link">About</a></li><li class="site-menu__item"><a href="/projects" class="site-menu__link">Projects</a></li><li class="site-menu__item"><a href="/posts" class="site-menu__link">Posts</a></li><li class="site-menu__item"><a href="/contacts" class="site-menu__link">Contacts</a></li><li class="site-menu__item"><a href="/search" class="site-menu__link">Search</a></li></ul></nav></header><div class="content-wrapper"><main><div class="post-header"><h1>Deploy current app to gitpages</h1><div class="post-metadata"><span>14 Jul 2026</span> <span>AlexS</span></div></div><div class="post-tags"><a href="/posts/tags/bash/">bash</a> <a href="/posts/tags/devops/">DevOps</a></div><div class="post-page"><h1>Keeping a GitHub Repository Small by Resetting History</h1><p>When publishing generated websites or static projects, Git history can become unnecessarily large because every deployment creates another commit containing almost the entire build output.</p><p>This deployment script replaces the repository history with a single commit on every deployment.</p><h2>How it works</h2><p>The script performs the following steps:</p><ol><li>Creates an orphan branch.</li><li>Adds all project files.</li><li>Creates a fresh commit.</li><li>Deletes the previous <code>main</code> branch.</li><li>Renames the orphan branch to <code>main</code>.</li><li>Runs Git garbage collection.</li><li>Force pushes the repository to GitHub.</li></ol><p>After deployment, the repository contains only one commit representing the current version of the project.</p><h2>Script</h2><pre class="language-bash"><code class="language-bash"><span class="token function">git</span> checkout <span class="token parameter variable">--orphan</span> current-build
+<span class="token function">git</span> <span class="token function">add</span> <span class="token parameter variable">--all</span>
+<span class="token function">git</span> commit <span class="token parameter variable">-m</span> <span class="token string">"Build: <span class="token variable"><span class="token variable">$(</span><span class="token function">date</span><span class="token variable">)</span></span>"</span>
+<span class="token function">git</span> branch <span class="token parameter variable">-D</span> main
+<span class="token function">git</span> branch <span class="token parameter variable">-m</span> main
+<span class="token function">git</span> reflog expire <span class="token parameter variable">--expire</span><span class="token operator">=</span>now <span class="token parameter variable">--all</span>
+<span class="token function">git</span> gc <span class="token parameter variable">--prune</span><span class="token operator">=</span>now <span class="token parameter variable">--aggressive</span>
+<span class="token function">git</span> push <span class="token parameter variable">--force</span> origin main</code></pre><h2>Advantages</h2><ul><li>Repository size remains almost constant.</li><li>Faster cloning.</li><li>Faster GitHub Pages deployments.</li><li>No accumulation of thousands of generated files.</li><li>Ideal for generated websites, PWAs, and static documentation.</li></ul><h2>Disadvantages</h2><ul><li>Complete Git history is removed.</li><li>Previous commits cannot be restored after the force push.</li><li>Not appropriate for collaborative projects or repositories where commit history is important.</li></ul><h2>Best use cases</h2><p>This approach is useful for repositories containing generated artifacts such as:</p><ul><li>Eleventy websites</li><li>Hugo sites</li><li>Jekyll blogs</li><li>Vue, React, Angular, or Svelte build outputs</li><li>PWAs</li><li>Documentation websites</li></ul><h2>Recommendation</h2><p>Keep your source code in a separate repository if preserving development history is important. Use this approach only for repositories where the latest published version is all that matters.</p><h2>Polished script</h2><pre class="language-bash"><code class="language-bash"><span class="token shebang important">#!/usr/bin/env bash</span>
+
+<span class="token builtin class-name">set</span> <span class="token parameter variable">-Eeuo</span> pipefail
+
+<span class="token assign-left variable">BRANCH</span><span class="token operator">=</span><span class="token string">"main"</span>
+<span class="token assign-left variable">TEMP_BRANCH</span><span class="token operator">=</span><span class="token string">"current-build"</span>
+
+<span class="token builtin class-name">echo</span> <span class="token string">"======================================"</span>
+<span class="token builtin class-name">echo</span> <span class="token string">" GitHub Pages Deployment"</span>
+<span class="token builtin class-name">echo</span> <span class="token string">"======================================"</span>
+
+<span class="token comment"># Make sure we are inside a git repository</span>
+<span class="token function">git</span> rev-parse --is-inside-work-tree <span class="token operator">></span>/dev/null
+
+<span class="token comment"># Check for uncommitted changes</span>
+<span class="token keyword">if</span> <span class="token punctuation">[</span><span class="token punctuation">[</span> <span class="token parameter variable">-n</span> <span class="token string">"<span class="token variable"><span class="token variable">$(</span><span class="token function">git</span> status <span class="token parameter variable">--porcelain</span><span class="token variable">)</span></span>"</span> <span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token keyword">then</span>
+    <span class="token builtin class-name">echo</span> <span class="token string">"Error: Working tree contains uncommitted changes."</span>
+    <span class="token builtin class-name">echo</span> <span class="token string">"Commit or stash them before running this script."</span>
+    <span class="token builtin class-name">exit</span> <span class="token number">1</span>
+<span class="token keyword">fi</span>
+
+<span class="token builtin class-name">echo</span> <span class="token string">"Removing previous temporary branch (if exists)..."</span>
+<span class="token function">git</span> branch <span class="token parameter variable">-D</span> <span class="token string">"<span class="token variable">$TEMP_BRANCH</span>"</span> <span class="token operator"><span class="token file-descriptor important">2</span>></span>/dev/null <span class="token operator">||</span> <span class="token boolean">true</span>
+
+<span class="token builtin class-name">echo</span> <span class="token string">"Creating orphan branch..."</span>
+<span class="token function">git</span> checkout <span class="token parameter variable">--orphan</span> <span class="token string">"<span class="token variable">$TEMP_BRANCH</span>"</span>
+
+<span class="token builtin class-name">echo</span> <span class="token string">"Adding files..."</span>
+<span class="token function">git</span> <span class="token function">add</span> <span class="token parameter variable">--all</span>
+
+<span class="token builtin class-name">echo</span> <span class="token string">"Creating commit..."</span>
+<span class="token function">git</span> commit <span class="token parameter variable">-m</span> <span class="token string">"Build: <span class="token variable"><span class="token variable">$(</span><span class="token function">date</span> <span class="token string">'+%Y-%m-%d %H:%M:%S'</span><span class="token variable">)</span></span>"</span>
+
+<span class="token builtin class-name">echo</span> <span class="token string">"Removing previous <span class="token variable">$BRANCH</span> branch..."</span>
+<span class="token function">git</span> branch <span class="token parameter variable">-D</span> <span class="token string">"<span class="token variable">$BRANCH</span>"</span> <span class="token operator"><span class="token file-descriptor important">2</span>></span>/dev/null <span class="token operator">||</span> <span class="token boolean">true</span>
+
+<span class="token builtin class-name">echo</span> <span class="token string">"Renaming branch..."</span>
+<span class="token function">git</span> branch <span class="token parameter variable">-m</span> <span class="token string">"<span class="token variable">$BRANCH</span>"</span>
+
+<span class="token builtin class-name">echo</span> <span class="token string">"Cleaning repository..."</span>
+<span class="token function">git</span> reflog expire <span class="token parameter variable">--expire</span><span class="token operator">=</span>now <span class="token parameter variable">--all</span>
+<span class="token function">git</span> gc <span class="token parameter variable">--prune</span><span class="token operator">=</span>now <span class="token parameter variable">--aggressive</span>
+
+<span class="token builtin class-name">echo</span>
+<span class="token builtin class-name">echo</span> <span class="token string">"Current history:"</span>
+<span class="token function">git</span> log <span class="token parameter variable">--graph</span> <span class="token parameter variable">--oneline</span> <span class="token parameter variable">--decorate</span> <span class="token parameter variable">-5</span>
+
+<span class="token builtin class-name">echo</span>
+<span class="token builtin class-name">echo</span> <span class="token string">"Force pushing..."</span>
+<span class="token function">git</span> push <span class="token parameter variable">--force</span> origin <span class="token string">"<span class="token variable">$BRANCH</span>"</span>
+
+<span class="token builtin class-name">echo</span>
+<span class="token builtin class-name">echo</span> <span class="token string">"Done!"</span>
+<span class="token builtin class-name">echo</span> <span class="token string">"Repository history now contains a single commit."</span></code></pre></div></main><aside class="sidebar"><h2>Latest Posts</h2><ul><li><strong>Deploy current app t...</strong> <small>14 Jul 2026</small></li><li><a href="/posts/alternative-js-logging/">Alternative JS Loggi...</a> <small>29 Jan 2025</small></li><li><a href="/posts/configure-htaccess-for-react-app/">Configure .htaccess ...</a> <small>16 Dec 2024</small></li><li><a href="/posts/junit-test-with-json/">JUnit Parameterized ...</a> <small>27 Sep 2024</small></li><li><a href="/posts/set-attributes/">Set All Directories ...</a> <small>27 Sep 2024</small></li><li><a href="/posts/setup-ftp-server/">Setup FTP Server on ...</a> <small>27 Sep 2024</small></li><li><a href="/posts/autoformat-java-maven/">Auto-Format Java Sou...</a> <small>07 Sep 2024</small></li><li><a href="/posts/autoformat-java-gradle/">Auto-Format Java Sou...</a> <small>06 Sep 2024</small></li><li><a href="/posts/disable-unwanted-task-gradle/">Disable Unwanted Tas...</a> <small>08 May 2024</small></li><li><a href="/posts/delete-old-files-in-the-temp-dir/">Clean Up Old Files i...</a> <small>15 Sep 2023</small></li></ul></aside></div><hr><footer class="site-footer"><span title="Thursday, July 23, 2026 at 08:52 PM">2026</span> © ScAlAn. | Back to the <a href="#top">top</a>.</footer></body></html>

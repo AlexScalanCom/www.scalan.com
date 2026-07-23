@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>WebClock</title>
+        <link rel="manifest" href="./manifest.json">
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body,
+            html {
+                height: 100%;
+                width: 100%;
+            }
+
+            body {
+                background: black;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+                flex-direction: column;
+                font-family: Arial, Helvetica, sans-serif;
+            }
+
+            .clockDate {
+                color: #AAA;
+                font-size: 180px;
+                display: flex;
+                position: relative;
+                overflow: hidden;
+            }
+            .clockTime {
+                color: #FFF;
+                font-size: 240px;
+                display: flex;
+                position: relative;
+                overflow: hidden;
+                font-family: monospace, monospace;
+            }
+            .weather {
+                color: #AAA;
+                font-size: 160px;
+                display: flex;
+                position: relative;
+                overflow: hidden;
+            }
+
+            /* Extra small devices (phones, 600px and down) */
+            @media only screen and (max-width: 600px) {
+                .clockDate {
+                    font-size: 80px;
+                }
+                .clockTime {
+                    font-size: 160px;
+                }
+                .weather {
+                    font-size: 80px;
+                }
+            }
+
+            /* Small devices (portrait tablets and large phones, 600px and up) */
+            @media only screen and (min-width: 600px) {
+                .clockDate {
+                    font-size: 80px;
+                }
+                .clockTime {
+                    font-size: 160px;
+                }
+                .weather {
+                    font-size: 80px;
+                }
+            }
+
+            /* Medium devices (landscape tablets, 768px and up) */
+            @media only screen and (min-width: 768px) {
+                .clockDate {
+                    font-size: 120px;
+                }
+                .clockTime {
+                    font-size: 180px;
+                }
+                .weather {
+                    font-size: 120px;
+                }
+            }
+
+            /* Large devices (laptops/desktops, 992px and up) */
+            @media only screen and (min-width: 992px) {
+                .clockDate {
+                    font-size: 140px;
+                }
+                .clockTime {
+                    font-size: 180px;
+                }
+                .weather {
+                    font-size: 140px;
+                }
+            }
+
+            /* Extra large devices (large laptops and desktops, 1200px and up) */
+            @media only screen and (min-width: 1200px) {
+                .clockDate {
+                    font-size: 160px;
+                }
+                .clockTime {
+                    font-size: 240px;
+                }
+                .weather {
+                    font-size: 160px;
+                }
+            }
+        </style>
+        <p class="clockDate">
+            <span id="year">0000</span>/<span id="month">00</span>/<span id="day">00</span>
+            <span id="dayOfWeek">-</span>
+        </p>
+        <p class="clockTime">
+            <span id="hours">00</span>
+            <span id="divider">:</span>
+            <span id="minutes">00</span>
+        </p>
+        <div class="weather" style="display: none;">T <span id="tempOC"></span>/<span id="tempAs"></span>℃&nbsp;<span id="windSpeed"></span>
+            <span id="windDir">&nbsp;&darr;&nbsp;&nbsp;</span></div>
+        <script>
+            var myVar = setInterval(function () {
+                myTimer();
+            }, 1000);
+
+            var old_mins = -1;
+            function myTimer() {
+                var dt = new Date();
+                var seconds = dt.getSeconds();
+                var minutes = dt.getMinutes();
+                var hours = dt.getHours();
+
+                var year = dt.getFullYear();
+                var month = dt.getMonth() + 1; // beware: January = 0; February = 1, etc.
+                var day = dt.getDate();
+
+                var dayOfWeek = dt.getDay(); // Sunday = 0, Monday = 1, etc.
+
+                var dayOfWeekStr = [
+                    "Sun",
+                    "Mon",
+                    "Tue",
+                    "Wed",
+                    "Thu",
+                    "Fri",
+                    "Sat"
+                ];
+
+                document
+                    .getElementById("year")
+                    .innerHTML = year;
+                document
+                    .getElementById("month")
+                    .innerHTML = (
+                        month < 10
+                        ? "0"
+                        : "") + month;
+                document
+                    .getElementById("day")
+                    .innerHTML = (
+                        day < 10
+                        ? "0"
+                        : "") + day;
+                document
+                    .getElementById("dayOfWeek")
+                    .innerHTML = dayOfWeekStr[dayOfWeek];
+
+                document
+                    .getElementById("hours")
+                    .innerHTML = (
+                        hours < 10
+                        ? "0"
+                        : "") + hours;
+                document
+                    .getElementById("minutes")
+                    .innerHTML = (
+                        minutes < 10
+                        ? "0"
+                        : "") + minutes;
+                document
+                    .getElementById("divider")
+                    .innerHTML = seconds % 2 == 0
+                        ? ":"
+                        : "&nbsp;";
+
+                if (old_mins == -1 || (old_mins != minutes && minutes % 20 == 0)) {
+                    var p1 = "aHR0cHM6Ly9hcGkub3BlbndlYXRoZXJtYXAub3JnL2RhdGEvMi41L3dlYXRoZXI/YXBwaWQ9OGM4YmVlMmE1YTkyMTg0N2Y1ZjFhOTAxNTFhZTA5YWUmcT1LaGFya2l2JnVuaXRzPW1ldHJpYyZkdD0=";
+                    old_mins = minutes;
+                    $.ajax({
+                        url: atob(p1) + dt.getTime(),
+                        dataType: 'json',
+                        success: function (result) {
+                            $("#tempOC").text(Math.floor(result.main.temp));
+                            $("#tempAs").text(Math.floor(result.main.feels_like));
+                            $("#windSpeed").text(Math.floor(result.wind.speed));
+
+                            var div = document.getElementById("windDir");
+                            div.style.webkitTransform = 'rotate(' + result.wind.deg + 'deg)';
+                            div.style.mozTransform = 'rotate(' + result.wind.deg + 'deg)';
+                            div.style.msTransform = 'rotate(' + result.wind.deg + 'deg)';
+                            div.style.oTransform = 'rotate(' + result.wind.deg + 'deg)';
+                            div.style.transform = 'rotate(' + result.wind.deg + 'deg)';
+                            $(".weather").show();
+                        }
+                    });
+                }
+
+            }
+        </script>
+    </body>
+</html>

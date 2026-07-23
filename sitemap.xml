@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <url>
+    <loc>/posts/hexagon/</loc>
+    <lastmod>2016-10-18</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/disable-multiple-cron-jobs/</loc>
+    <lastmod>2020-07-02</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/linux-dir-size/</loc>
+    <lastmod>2020-12-19</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/wait-beanstalk-ready/</loc>
+    <lastmod>2020-12-19</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/monitor-ec2-from-bash/</loc>
+    <lastmod>2021-01-18</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/python-get-weather/</loc>
+    <lastmod>2021-02-11</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/python-get-disk-info/</loc>
+    <lastmod>2021-02-15</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/python-get-cpu-info/</loc>
+    <lastmod>2021-02-27</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/knights1/</loc>
+    <lastmod>2021-03-12</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/beanstalk-logrotate/</loc>
+    <lastmod>2021-03-18</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/docker-elk-local/</loc>
+    <lastmod>2021-07-06</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/docker-copy-file/</loc>
+    <lastmod>2021-09-01</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/linux-access-to-usbdevice/</loc>
+    <lastmod>2021-09-21</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/list-ec2-by-beanstalk-name/</loc>
+    <lastmod>2021-10-19</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/check-server-by-ip/</loc>
+    <lastmod>2021-11-02</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/python-meteo-clock/</loc>
+    <lastmod>2022-05-11</lastmod>
+  </url>
+  
+  <url>
+    <loc>/projects/service-to-gather-sports-data/</loc>
+    <lastmod>2022-06-28</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/execute-sqls-in-the-docker-postgres-db/</loc>
+    <lastmod>2022-07-12</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/prepare-pem-keys-objects-from-strings/</loc>
+    <lastmod>2022-08-01</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/encrypt-and-encode-string-with-public-key/</loc>
+    <lastmod>2022-08-05</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/jpa-get-columns-names-map/</loc>
+    <lastmod>2022-08-19</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/custom-json-comparator/</loc>
+    <lastmod>2022-08-28</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/dbUnit-h2-jsonb/</loc>
+    <lastmod>2022-09-22</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/tetris/</loc>
+    <lastmod>2022-10-14</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/tetris2/</loc>
+    <lastmod>2022-10-22</lastmod>
+  </url>
+  
+  <url>
+    <loc>/projects/support-wp-sites-aws/</loc>
+    <lastmod>2022-11-24</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/cp866-to-utf-on-mac/</loc>
+    <lastmod>2023-01-18</lastmod>
+  </url>
+  
+  <url>
+    <loc>/projects/set-of-REST-services/</loc>
+    <lastmod>2023-03-15</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/custom-display-resolution/</loc>
+    <lastmod>2023-03-22</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/configure-conky/</loc>
+    <lastmod>2023-04-17</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/create-jar-with-sources-maven/</loc>
+    <lastmod>2023-05-07</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/configure-systemdatectl/</loc>
+    <lastmod>2023-07-02</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/write-image-on-raspberry-pi/</loc>
+    <lastmod>2023-07-13</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/linux-mouse-mover/</loc>
+    <lastmod>2023-07-26</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/fix-linux-mc-theme/</loc>
+    <lastmod>2023-08-31</lastmod>
+  </url>
+  
+  <url>
+    <loc>/projects/support-fintech-infrastructure/</loc>
+    <lastmod>2023-08-31</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/mouse-mover/</loc>
+    <lastmod>2023-09-11</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/delete-old-files-in-the-temp-dir/</loc>
+    <lastmod>2023-09-15</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/disable-unwanted-task-gradle/</loc>
+    <lastmod>2024-05-08</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/autoformat-java-gradle/</loc>
+    <lastmod>2024-09-06</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/autoformat-java-maven/</loc>
+    <lastmod>2024-09-07</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/junit-test-with-json/</loc>
+    <lastmod>2024-09-27</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/set-attributes/</loc>
+    <lastmod>2024-09-27</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/setup-ftp-server/</loc>
+    <lastmod>2024-09-27</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/configure-htaccess-for-react-app/</loc>
+    <lastmod>2024-12-16</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/alternative-js-logging/</loc>
+    <lastmod>2025-01-29</lastmod>
+  </url>
+  
+  <url>
+    <loc>/projects/java-fintech-support/</loc>
+    <lastmod>2025-03-01</lastmod>
+  </url>
+  
+  <url>
+    <loc>/contacts/</loc>
+    <lastmod>2026-07-02</lastmod>
+  </url>
+  
+  <url>
+    <loc>/</loc>
+    <lastmod>2026-07-02</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/tags/springboot/</loc>
+    <lastmod>2026-07-02</lastmod>
+  </url>
+  
+  <url>
+    <loc>/projects/</loc>
+    <lastmod>2026-07-04</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/</loc>
+    <lastmod>2026-07-05</lastmod>
+  </url>
+  
+  <url>
+    <loc>/search/</loc>
+    <lastmod>2026-07-06</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/deploy-current-app-to-gitpages/</loc>
+    <lastmod>2026-07-14</lastmod>
+  </url>
+</urlset>

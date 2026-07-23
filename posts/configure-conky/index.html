@@ -1,0 +1,181 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/png" href="/favicon.png"><link rel="stylesheet" href="https://unpkg.com/prismjs@1.20.0/themes/prism-okaidia.css"/><link rel="stylesheet" type="text/css" href="/static/css/tailwind.css"/><title>Configure Conky – A Beautiful System Monitor for Linux</title></head><body class="m-0 p-0"><a name="top"></a><header class="site-header"><nav class="site-nav"><a href="/" class="site-logo">scalan.com</a> <input type="checkbox" id="menu-toggle" class="menu-toggle__input"/> <label for="menu-toggle" class="menu-toggle" aria-label="Open navigation menu"><span class="menu-toggle__bar"></span> <span class="menu-toggle__bar"></span> <span class="menu-toggle__bar"></span></label><ul class="site-menu"><li class="site-menu__item"><a href="/" class="site-menu__link">About</a></li><li class="site-menu__item"><a href="/projects" class="site-menu__link">Projects</a></li><li class="site-menu__item"><a href="/posts" class="site-menu__link">Posts</a></li><li class="site-menu__item"><a href="/contacts" class="site-menu__link">Contacts</a></li><li class="site-menu__item"><a href="/search" class="site-menu__link">Search</a></li></ul></nav></header><div class="content-wrapper"><main><div class="post-header"><h1>Configure Conky – A Beautiful System Monitor for Linux</h1><div class="post-metadata"><span>17 Apr 2023</span> <span>AlexS</span></div></div><div class="post-tags"><a href="/posts/tags/linux/">linux</a> <a href="/posts/tags/devops/">DevOps</a></div><div class="post-page"><p>Conky is one of the most popular lightweight system monitors for Linux. It runs directly on your desktop, displaying real-time information about CPU usage, memory, disk I/O, network traffic, running processes, and more — all with a clean and minimal footprint.</p><p>In this post, you'll find two complete Conky configurations: one tuned for a multi-core desktop machine and another optimized for a Raspberry Pi. Both configs use the Lua-based syntax (<code>conky.config</code> / <code>conky.text</code>) supported in Conky 1.10+.</p><hr><h2>Desktop Configuration</h2><p>This configuration is designed for a desktop computer with up to 12 CPU cores, dual storage devices, and a wireless network interface (<code>wlp4s0</code>). It displays:</p><ul><li><strong>System info</strong> — OS name, kernel version, CPU frequency, and temperature</li><li><strong>Per-core stats</strong> — individual core frequency and utilization bars</li><li><strong>Memory</strong> — RAM and swap usage with progress bars</li><li><strong>Top processes</strong> — the five most CPU- and memory-intensive processes</li><li><strong>Storage</strong> — disk I/O and filesystem usage for multiple mounts</li><li><strong>Wireless</strong> — SSID, signal strength, bitrate, and network speed graphs</li></ul><p>Save the following as <code>~/.conkyrc</code>:</p><pre class="language-lua"><code class="language-lua">conky<span class="token punctuation">.</span>config <span class="token operator">=</span> <span class="token punctuation">{</span>
+    alignment <span class="token operator">=</span> <span class="token string">'top_right'</span><span class="token punctuation">,</span>
+    background <span class="token operator">=</span> <span class="token keyword">true</span><span class="token punctuation">,</span>
+    border_width <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">,</span>
+    cpu_avg_samples <span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">,</span>
+    default_color <span class="token operator">=</span> <span class="token string">'gray'</span><span class="token punctuation">,</span>
+    default_outline_color <span class="token operator">=</span> <span class="token string">'white'</span><span class="token punctuation">,</span>
+    default_shade_color <span class="token operator">=</span> <span class="token string">'white'</span><span class="token punctuation">,</span>
+    color1 <span class="token operator">=</span> <span class="token string">'#1793d1'</span><span class="token punctuation">,</span>
+    double_buffer <span class="token operator">=</span> <span class="token keyword">true</span><span class="token punctuation">,</span>
+    draw_borders <span class="token operator">=</span> <span class="token keyword">false</span><span class="token punctuation">,</span>
+    draw_graph_borders <span class="token operator">=</span> <span class="token keyword">true</span><span class="token punctuation">,</span>
+    draw_outline <span class="token operator">=</span> <span class="token keyword">false</span><span class="token punctuation">,</span>
+    draw_shades <span class="token operator">=</span> <span class="token keyword">false</span><span class="token punctuation">,</span>
+    extra_newline <span class="token operator">=</span> <span class="token keyword">false</span><span class="token punctuation">,</span>
+    font <span class="token operator">=</span> <span class="token string">'Roboto Mono:size=7'</span><span class="token punctuation">,</span>
+    gap_x <span class="token operator">=</span> <span class="token number">30</span><span class="token punctuation">,</span>
+    gap_y <span class="token operator">=</span> <span class="token number">30</span><span class="token punctuation">,</span>
+    minimum_height <span class="token operator">=</span> <span class="token number">300</span><span class="token punctuation">,</span>
+    minimum_width <span class="token operator">=</span> <span class="token number">300</span><span class="token punctuation">,</span>
+    net_avg_samples <span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">,</span>
+    no_buffers <span class="token operator">=</span> <span class="token keyword">true</span><span class="token punctuation">,</span>
+    out_to_console <span class="token operator">=</span> <span class="token keyword">false</span><span class="token punctuation">,</span>
+    out_to_ncurses <span class="token operator">=</span> <span class="token keyword">false</span><span class="token punctuation">,</span>
+    out_to_stderr <span class="token operator">=</span> <span class="token keyword">false</span><span class="token punctuation">,</span>
+    out_to_x <span class="token operator">=</span> <span class="token keyword">true</span><span class="token punctuation">,</span>
+    own_window <span class="token operator">=</span> <span class="token keyword">true</span><span class="token punctuation">,</span>
+    own_window_class <span class="token operator">=</span> <span class="token string">'Conky'</span><span class="token punctuation">,</span>
+    own_window_transparent <span class="token operator">=</span> <span class="token keyword">true</span><span class="token punctuation">,</span>
+    own_window_argb_visual <span class="token operator">=</span> <span class="token keyword">true</span><span class="token punctuation">,</span>
+    own_window_type <span class="token operator">=</span> <span class="token string">'desktop'</span><span class="token punctuation">,</span>
+    own_window_hints <span class="token operator">=</span><span class="token string">'undecorated,sticky,skip_taskbar,skip_pager,below'</span><span class="token punctuation">,</span>
+    show_graph_range <span class="token operator">=</span> <span class="token keyword">false</span><span class="token punctuation">,</span>
+    show_graph_scale <span class="token operator">=</span> <span class="token keyword">false</span><span class="token punctuation">,</span>
+    stippled_borders <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span>
+    update_interval <span class="token operator">=</span> <span class="token number">1.0</span><span class="token punctuation">,</span>
+    uppercase <span class="token operator">=</span> <span class="token keyword">false</span><span class="token punctuation">,</span>
+    use_spacer <span class="token operator">=</span> <span class="token string">'none'</span><span class="token punctuation">,</span>
+    use_xft <span class="token operator">=</span> <span class="token keyword">true</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span>
+
+conky<span class="token punctuation">.</span>text <span class="token operator">=</span> <span class="token string">[[
+${color1}${font ConkySymbols:size=20}t${font} ${voffset -10}GNU/Linux» $hr ${color}
+${color1}${goto 35}OS: ${alignr}${color}${exec lsb_release -ds}
+${color1}${goto 35}Kernel: ${alignr}${color}$kernel on $machine
+${color1}${goto 35}CPU Speed: ${alignr}${color}$freq_g GHZ
+${color1}${goto 35}CPU Temp: ${alignr}${color}${hwmon 0 temp 1}°C
+
+${color1}${font ConkySymbols:size=16}f${font} ${voffset -10} System» $hr${color}
+${color1}${goto 35}Core 01 : ${color}${freq_g 1}GHz ${alignr}${cpu cpu0}% ${cpubar cpu0 4,100}
+${color1}${goto 35}Core 02 : ${color}${freq_g 2}GHz ${alignr}${cpu cpu1}% ${cpubar cpu1 4,100}
+${color1}${goto 35}Core 03 : ${color}${freq_g 3}GHz ${alignr}${cpu cpu2}% ${cpubar cpu2 4,100}
+${color1}${goto 35}Core 04 : ${color}${freq_g 4}GHz ${alignr}${cpu cpu3}% ${cpubar cpu3 4,100}
+${color1}${goto 35}Core 05 : ${color}${freq_g 5}GHz ${alignr}${cpu cpu5}% ${cpubar cpu5 4,100}
+${color1}${goto 35}Core 06 : ${color}${freq_g 6}GHz ${alignr}${cpu cpu6}% ${cpubar cpu6 4,100}
+${color1}${goto 35}Core 07 : ${color}${freq_g 7}GHz ${alignr}${cpu cpu7}% ${cpubar cpu7 4,100}
+${color1}${goto 35}Core 08 : ${color}${freq_g 8}GHz ${alignr}${cpu cpu8}% ${cpubar cpu8 4,100}
+${color1}${goto 35}Core 09 : ${color}${freq_g 9}GHz ${alignr}${cpu cpu9}% ${cpubar cpu9 4,100}
+${color1}${goto 35}Core 10 : ${color}${freq_g 10}GHz ${alignr}${cpu cpu10}% ${cpubar cpu10 4,100}
+${color1}${goto 35}Core 11 : ${color}${freq_g 11}GHz ${alignr}${cpu cpu11}% ${cpubar cpu11 4,100}
+${color1}${goto 35}Core 12 : ${color}${freq_g 12}GHz ${alignr}${cpu cpu12}% ${cpubar cpu12 4,100}
+
+${color1}${goto 35}Uptime : ${color}$uptime_short ${alignr}${color1}Load  : ${color}${loadavg}
+#${color1}${font ConkySymbols:size=16}h${font} ${voffset -10} Temperature» $hr${color}
+#${color1}${goto 35}CPU : ${color}${exec sensors | grep 'temp1' | awk 'NR==1{print $2}'} ${alignr}${color1}GPU : ${color}${exec sensors | grep 'temp1' | awk 'NR==2{print $2}'}
+
+${color1}${font ConkySymbols:size=16}J${font} ${voffset -10}Memory» $hr${color}
+${color1}${goto 35}RAM : ${color}$mem/$memmax ${alignr}$memperc% ${membar 4,100}
+${color1}${goto 35}SWAP: ${color}$swap/$swapmax $alignr}$swapperc% ${swapbar 4,100}
+
+${color1}${font ConkySymbols:size=16}n${font} ${voffset -10} Processes» $hr${color}
+
+${color1}${goto 35}CPU usage ${alignr}Memory Usage${color}
+${color1}${goto 35}${stippled_hr}${color}
+${goto 35}${top name 1} ${color}${top cpu 1}% ${alignr}${top_mem name 1}${top_mem mem_res 1}
+${goto 35}${top name 2} ${color}${top cpu 2}% ${alignr}${top_mem name 2}${top_mem mem_res 2}
+${goto 35}${top name 3} ${color}${top cpu 3}% ${alignr}${top_mem name 3}${top_mem mem_res 3}
+${goto 35}${top name 4} ${color}${top cpu 4}% ${alignr}${top_mem name 4}${top_mem mem_res 4}
+${goto 35}${top name 5} ${color}${top cpu 5}% ${alignr}${top_mem name 5}${top_mem mem_res 5}
+
+${color1}${goto 35}Processes: ${color}$processes ${color1}Running: ${color}$running_processes
+
+${color1}${font ConkySymbols:size=16}k${font} ${voffset -10} Storage» $hr${color}
+${color1}${goto 35}Read/Write : ${color}${diskio_read /dev/sdb}/${diskio_write /dev/sdb}
+${color1}${goto 35}ROOT : ${color}${fs_used /}/${fs_size /} ${alignr}${fs_used_perc /}% ${fs_bar 4,100 /}
+${color1}${goto 35}home : ${color}${fs_used /home/}/${fs_size /home/} ${alignr}${fs_used_perc /home/}% ${fs_bar 4,100 /home/}
+${color1}${goto 35}Read/Write : ${color}${diskio_read /dev/sda}/${diskio_write /dev/sda}
+${color1}${goto 35}Arch : ${color}${fs_used /media/win_c}/${fs_size /media/win_c} ${alignr}${fs_used_perc /media/win_c}% ${fs_bar 4,100 /media/win_c}
+${goto 35}
+
+${color1}${font ConkySymbols:size=16}b${font} ${voffset -10} Wireless» $hr${color}
+${color1}${goto 35}SSID          : ${color}${wireless_essid wlp4s0} ${color1}${alignr}Signal: ${color}${wireless_link_qual_perc wlp4s0}% ${wireless_link_bar 4,100 wlp4s0}
+${color1}${goto 35}Bitrate       : ${color}${wireless_bitrate wlp4s0}
+${color1}${goto 35}Total Down/Up : ${color}${totaldown wlp4s0}/${totalup wlan0}
+${color1}${goto 35}Speed Down/Up : ${color}${downspeed wlp4s0}/${upspeed wlan0}
+${alignc}${color #ff0000}${upspeedgraph wlp4s0 40,150 000000 ff0000} ${color #22F643}${downspeedgraph wlp4s0 40,150 000000 22F643}${color grey}
+]]</span></code></pre><h3>Result</h3><p><picture><source type="image/avif" srcset="/posts/configure-conky/ConkyDesktop-64.avif 64w, /posts/configure-conky/ConkyDesktop-391.avif 391w" sizes="(min-width: 900px) 800px, 100vw"><source type="image/webp" srcset="/posts/configure-conky/ConkyDesktop-64.webp 64w, /posts/configure-conky/ConkyDesktop-391.webp 391w" sizes="(min-width: 900px) 800px, 100vw"><source type="image/jpeg" srcset="/posts/configure-conky/ConkyDesktop-64.jpeg 64w, /posts/configure-conky/ConkyDesktop-391.jpeg 391w" sizes="(min-width: 900px) 800px, 100vw"><img alt="Conky on desktop Linux" loading="lazy" decoding="async" src="/posts/configure-conky/ConkyDesktop-64.jpeg" width="391" height="713"></picture></p><hr><h2>Raspberry Pi Configuration</h2><p>The Raspberry Pi variant is simplified to match the hardware: 4 CPU cores, a single root filesystem, and the <code>wlan0</code> wireless interface. The OS detection also uses a more portable command that works across different Linux distributions.</p><p>Save this as <code>~/.conkyrc</code> on your Pi:</p><pre class="language-lua"><code class="language-lua">conky<span class="token punctuation">.</span>config <span class="token operator">=</span> <span class="token punctuation">{</span>
+    alignment <span class="token operator">=</span> <span class="token string">'top_right'</span><span class="token punctuation">,</span>
+    background <span class="token operator">=</span> <span class="token keyword">true</span><span class="token punctuation">,</span>
+    border_width <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">,</span>
+    cpu_avg_samples <span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">,</span>
+    default_color <span class="token operator">=</span> <span class="token string">'gray'</span><span class="token punctuation">,</span>
+    default_outline_color <span class="token operator">=</span> <span class="token string">'white'</span><span class="token punctuation">,</span>
+    default_shade_color <span class="token operator">=</span> <span class="token string">'white'</span><span class="token punctuation">,</span>
+    color1 <span class="token operator">=</span> <span class="token string">'#1793d1'</span><span class="token punctuation">,</span>
+    double_buffer <span class="token operator">=</span> <span class="token keyword">true</span><span class="token punctuation">,</span>
+    draw_borders <span class="token operator">=</span> <span class="token keyword">false</span><span class="token punctuation">,</span>
+    draw_graph_borders <span class="token operator">=</span> <span class="token keyword">true</span><span class="token punctuation">,</span>
+    draw_outline <span class="token operator">=</span> <span class="token keyword">false</span><span class="token punctuation">,</span>
+    draw_shades <span class="token operator">=</span> <span class="token keyword">false</span><span class="token punctuation">,</span>
+    extra_newline <span class="token operator">=</span> <span class="token keyword">false</span><span class="token punctuation">,</span>
+    font <span class="token operator">=</span> <span class="token string">'Roboto Mono:size=7'</span><span class="token punctuation">,</span>
+    gap_x <span class="token operator">=</span> <span class="token number">30</span><span class="token punctuation">,</span>
+    gap_y <span class="token operator">=</span> <span class="token number">30</span><span class="token punctuation">,</span>
+    minimum_height <span class="token operator">=</span> <span class="token number">300</span><span class="token punctuation">,</span>
+    minimum_width <span class="token operator">=</span> <span class="token number">300</span><span class="token punctuation">,</span>
+    net_avg_samples <span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">,</span>
+    no_buffers <span class="token operator">=</span> <span class="token keyword">true</span><span class="token punctuation">,</span>
+    out_to_console <span class="token operator">=</span> <span class="token keyword">false</span><span class="token punctuation">,</span>
+    out_to_ncurses <span class="token operator">=</span> <span class="token keyword">false</span><span class="token punctuation">,</span>
+    out_to_stderr <span class="token operator">=</span> <span class="token keyword">false</span><span class="token punctuation">,</span>
+    out_to_x <span class="token operator">=</span> <span class="token keyword">true</span><span class="token punctuation">,</span>
+    own_window <span class="token operator">=</span> <span class="token keyword">true</span><span class="token punctuation">,</span>
+    own_window_class <span class="token operator">=</span> <span class="token string">'Conky'</span><span class="token punctuation">,</span>
+    own_window_transparent <span class="token operator">=</span> <span class="token keyword">true</span><span class="token punctuation">,</span>
+    own_window_argb_visual <span class="token operator">=</span> <span class="token keyword">true</span><span class="token punctuation">,</span>
+    own_window_type <span class="token operator">=</span> <span class="token string">'desktop'</span><span class="token punctuation">,</span>
+    own_window_hints <span class="token operator">=</span><span class="token string">'undecorated,sticky,skip_taskbar,skip_pager,below'</span><span class="token punctuation">,</span>
+    show_graph_range <span class="token operator">=</span> <span class="token keyword">false</span><span class="token punctuation">,</span>
+    show_graph_scale <span class="token operator">=</span> <span class="token keyword">false</span><span class="token punctuation">,</span>
+    stippled_borders <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span>
+    update_interval <span class="token operator">=</span> <span class="token number">1.0</span><span class="token punctuation">,</span>
+    uppercase <span class="token operator">=</span> <span class="token keyword">false</span><span class="token punctuation">,</span>
+    use_spacer <span class="token operator">=</span> <span class="token string">'none'</span><span class="token punctuation">,</span>
+    use_xft <span class="token operator">=</span> <span class="token keyword">true</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span>
+
+conky<span class="token punctuation">.</span>text <span class="token operator">=</span> <span class="token string">[[
+${color1}${font ConkySymbols:size=20}t${font} ${voffset -10}GNU/Linux» $hr ${color}
+${color1}${goto 35}OS: ${alignr}${color}${execi 86400 cat `ls -atr /etc/*-release | tail -2` | grep "PRETTY_NAME" | cut -d= -f2 |  sed 's/"//g'}
+${color1}${goto 35}Kernel: ${alignr}${color}$kernel on $machine
+${color1}${goto 35}CPU Speed: ${alignr}${color}$freq_g GHZ
+${color1}${goto 35}CPU Temp: ${alignr}${color}${hwmon 0 temp 1}°C
+
+${color1}${font ConkySymbols:size=16}f${font} ${voffset -10} System» $hr${color}
+${color1}${goto 35}Core 1 : ${color}${freq_g 1}GHz ${alignr}${cpu cpu0}% ${cpubar cpu0 4,100}
+${color1}${goto 35}Core 2 : ${color}${freq_g 2}GHz ${alignr}${cpu cpu1}% ${cpubar cpu1 4,100}
+${color1}${goto 35}Core 3 : ${color}${freq_g 3}GHz ${alignr}${cpu cpu2}% ${cpubar cpu2 4,100}
+${color1}${goto 35}Core 4 : ${color}${freq_g 4}GHz ${alignr}${cpu cpu3}% ${cpubar cpu3 4,100}
+
+${color1}${goto 35}Uptime : ${color}$uptime_short ${alignr}${color1}Load  : ${color}${loadavg}
+#${color1}${font ConkySymbols:size=16}h${font} ${voffset -10} Temperature» $hr${color}
+#${color1}${goto 35}CPU : ${color}${exec sensors | grep 'temp1' | awk 'NR==1{print $2}'} ${alignr}${color1}GPU : ${color}${exec sensors | grep 'temp1' | awk 'NR==2{print $2}'}
+
+${color1}${font ConkySymbols:size=16}J${font} ${voffset -10}Memory» $hr${color}
+${color1}${goto 35}RAM : ${color}$mem/$memmax ${alignr}$memperc% ${membar 4,100}
+${color1}${goto 35}SWAP: ${color}$swap/$swapmax $alignr}$swapperc% ${swapbar 4,100}
+
+${color1}${font ConkySymbols:size=16}n${font} ${voffset -10} Processes» $hr${color}
+
+${color1}${goto 35}CPU usage ${alignr}Memory Usage${color}
+${color1}${goto 35}${stippled_hr}${color}
+${goto 35}${top name 1} ${color}${top cpu 1}% ${alignr}${top_mem name 1}${top_mem mem_res 1}
+${goto 35}${top name 2} ${color}${top cpu 2}% ${alignr}${top_mem name 2}${top_mem mem_res 2}
+${goto 35}${top name 3} ${color}${top cpu 3}% ${alignr}${top_mem name 3}${top_mem mem_res 3}
+${goto 35}${top name 4} ${color}${top cpu 4}% ${alignr}${top_mem name 4}${top_mem mem_res 4}
+${goto 35}${top name 5} ${color}${top cpu 5}% ${alignr}${top_mem name 5}${top_mem mem_res 5}
+
+${color1}${goto 35}Processes: ${color}$processes ${color1}Running: ${color}$running_processes
+
+${color1}${font ConkySymbols:size=16}k${font} ${voffset -10} Storage» $hr${color}
+${color1}${goto 35}ROOT : ${color}${fs_used /}/${fs_size /} ${alignr}${fs_used_perc /}% ${fs_bar 4,100 /}
+${goto 35}
+
+${color1}${font ConkySymbols:size=16}b${font} ${voffset -10} Wireless» $hr${color}
+${color1}${goto 35}SSID          : ${color}${wireless_essid wlan0} ${color1}${alignr}Signal: ${color}${wireless_link_qual_perc wlan0}% ${wireless_link_bar 4,100 wlan0}
+${color1}${goto 35}Bitrate       : ${color}${wireless_bitrate wlan0}
+${color1}${goto 35}Total Down/Up : ${color}${totaldown wlan0}/${totalup wlan0}
+${color1}${goto 35}Speed Down/Up : ${color}${downspeed wlan0}/${upspeed wlan0}
+${alignc}${color #ff0000}${upspeedgraph wlan0 40,150 000000 ff0000} ${color #22F643}${downspeedgraph wlan0 40,150 000000 22F643}${color grey}
+]]</span></code></pre><h3>Result</h3><p><picture><source type="image/avif" srcset="/posts/configure-conky/ConkyRaspberryPi-e1681753364139-64.avif 64w, /posts/configure-conky/ConkyRaspberryPi-e1681753364139-380.avif 380w" sizes="(min-width: 900px) 800px, 100vw"><source type="image/webp" srcset="/posts/configure-conky/ConkyRaspberryPi-e1681753364139-64.webp 64w, /posts/configure-conky/ConkyRaspberryPi-e1681753364139-380.webp 380w" sizes="(min-width: 900px) 800px, 100vw"><source type="image/jpeg" srcset="/posts/configure-conky/ConkyRaspberryPi-e1681753364139-64.jpeg 64w, /posts/configure-conky/ConkyRaspberryPi-e1681753364139-380.jpeg 380w" sizes="(min-width: 900px) 800px, 100vw"><img alt="Conky on Raspberry Pi" loading="lazy" decoding="async" src="/posts/configure-conky/ConkyRaspberryPi-e1681753364139-64.jpeg" width="380" height="615"></picture></p><hr><h2>Quick Start</h2><p>Once your <code>~/.conkyrc</code> is in place, launch Conky from a terminal:</p><pre class="language-bash"><code class="language-bash">conky</code></pre><p>It will start automatically in the background. To restart after making configuration changes, kill the existing process and relaunch:</p><pre class="language-bash"><code class="language-bash"><span class="token function">pkill</span> conky <span class="token operator">&amp;&amp;</span> <span class="token function">sleep</span> <span class="token number">1</span> <span class="token operator">&amp;&amp;</span> conky</code></pre><h2>Customization Tips</h2><ul><li><strong>Network interface</strong> — replace <code>wlp4s0</code> or <code>wlan0</code> with your actual interface name (check with <code>ip a</code>).</li><li><strong>Disk devices</strong> — update <code>/dev/sda</code>, <code>/dev/sdb</code>, and mount paths to match your storage layout.</li><li><strong>Font</strong> — the config uses <code>Roboto Mono</code> and <code>ConkySymbols</code>. Install both fonts if icons don't render correctly.</li><li><strong>Position</strong> — change <code>alignment = 'top_right'</code> to <code>top_left</code>, <code>bottom_right</code>, or <code>bottom_left</code> to reposition the panel.</li></ul><hr><p>These configurations give you a clean, information-dense system monitor that runs with virtually zero overhead. Customize them further to match your workflow and hardware.</p></div></main><aside class="sidebar"><h2>Latest Posts</h2><ul><li><a href="/posts/deploy-current-app-to-gitpages/">Deploy current app t...</a> <small>14 Jul 2026</small></li><li><a href="/posts/alternative-js-logging/">Alternative JS Loggi...</a> <small>29 Jan 2025</small></li><li><a href="/posts/configure-htaccess-for-react-app/">Configure .htaccess ...</a> <small>16 Dec 2024</small></li><li><a href="/posts/junit-test-with-json/">JUnit Parameterized ...</a> <small>27 Sep 2024</small></li><li><a href="/posts/set-attributes/">Set All Directories ...</a> <small>27 Sep 2024</small></li><li><a href="/posts/setup-ftp-server/">Setup FTP Server on ...</a> <small>27 Sep 2024</small></li><li><a href="/posts/autoformat-java-maven/">Auto-Format Java Sou...</a> <small>07 Sep 2024</small></li><li><a href="/posts/autoformat-java-gradle/">Auto-Format Java Sou...</a> <small>06 Sep 2024</small></li><li><a href="/posts/disable-unwanted-task-gradle/">Disable Unwanted Tas...</a> <small>08 May 2024</small></li><li><a href="/posts/delete-old-files-in-the-temp-dir/">Clean Up Old Files i...</a> <small>15 Sep 2023</small></li></ul></aside></div><hr><footer class="site-footer"><span title="Thursday, July 23, 2026 at 08:52 PM">2026</span> © ScAlAn. | Back to the <a href="#top">top</a>.</footer></body></html>

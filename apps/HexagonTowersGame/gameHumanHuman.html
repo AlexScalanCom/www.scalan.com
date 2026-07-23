@@ -1,0 +1,65 @@
+<html>
+    <head>
+        <title>Hexagon Towers Game</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="css/style.css" rel="stylesheet">
+        <script src="js/jquery-3.1.1.min.js"></script>
+        <script src="js/game.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+    </head>
+    <body style="background-image: url('img/bg.jpg'); background-size: initial">
+        <div class="head"><a href="index.html" class="a">&larr;Back</a></div>
+        <div>
+            <table>
+                <tr>
+                    <td><span id="player"></span></td>
+                    <td>TurnN: <span id="turnN"></span></td>
+                    <td>TurnsMax: <span id="turnsMax"></span></td>
+                    <td> TurnsLeft: <span id="turnsLeft"></span></td>
+                    <td>Cells: <span id="freeCells"></span> <span id="player1Cells" style="color: #080"></span> <span id="winsMark"></span> <span id="player2Cells" style="color: #800"></span></td>
+                </tr>
+            </table>
+        </div>
+    <center>
+        <canvas id="HexCanvas" width="800" height="450"></canvas>
+    </center>
+    <button class="btn" style="margin-left: 25px; margin-bottom: 5px;" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+        История
+    </button>
+    <div class="collapse"  id="collapseExample">
+        <div class="well">
+            <span id="history"></span>
+        </div>
+        <button id="downloadLogButton" class="btn" style="margin-left: 25px; margin-bottom: 5px;" type="button"  onclick="downloadData(gameField);" class="btn">
+            Сохранить
+        </button>
+    </div>
+    <script>
+        var gameField = {
+            mode: 2,
+            player1: {col: 1, row: 3},
+            player2: {col: 30, row: 8},
+            maxTurns: 51,
+            width: 15,
+            height: 31,
+            history: []
+        };
+
+        var canvas = document.getElementById("HexCanvas");
+        canvas.width = window.innerWidth * 0.9;
+        canvas.height = window.innerHeight * 0.9;
+
+        $(document).ready(function () {
+            if (gameField.width > 10) {
+                gameField.width = 10;
+            }
+            if (gameField.height > 30) {
+                gameField.height = 30;
+            }
+            new HexagonGrid("HexCanvas", (canvas.width / gameField.height) / 1.6, gameField, 0, false);
+        });
+    </script>
+</body>
+</html>

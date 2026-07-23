@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
+
+<style>
+body {
+  background-color: #606060;
+  text-align: center;
+  margin-top: 10px;
+}
+
+#countdown {
+  color: white;
+  font-family: "Roboto Mono", monospace;
+  margin-bottom: 10px;
+}
+
+.shape {
+  font-family: "Roboto Mono", monospace;
+  font-size: 35px;
+  line-height: 35px;
+  white-space: nowrap;
+  text-align: center;
+  display: block;
+  margin-top: 30px;
+}
+</style>
+</head>
+
+<body>
+
+<h2 id="countdown"></h2>
+<p id="shape" class="shape"></p>
+
+<script>
+const target = new Date('2027-04-14T00:00:00');
+
+function render() {
+  const now = new Date();
+
+  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const end = new Date(target.getFullYear(), target.getMonth(), target.getDate());
+
+  const diffTime = end - start;
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  if (diffDays > 0) {
+    const weeks = Math.ceil(diffDays / 7);
+
+    document.getElementById("countdown").innerText =
+      `${diffDays} / ` +
+      `${weeks}`;
+
+    const colors = Array.from({ length: weeks }, (_, i) =>
+      `hsl(${Math.floor((i * 360) / weeks)}, 80%, 60%)`
+    );
+
+    // 🎲 случайная фигура
+    const shapes = ["triangle", "diamond", "square"];
+    const choice = shapes[Math.floor(Math.random() * shapes.length)];
+
+    let html = "";
+
+    if (choice === "triangle") {
+      html = buildTriangle(diffDays, colors);
+    } else if (choice === "diamond") {
+      html = buildDiamond(diffDays, colors);
+    } else {
+      html = buildSquare(diffDays, colors);
+    }
+
+    document.getElementById("shape").innerHTML = html;
+
+  } else {
+    document.getElementById("countdown").innerText = "🎉 Today!";
+    document.getElementById("shape").innerHTML = "";
+  }
+}
+
+// ===== TRIANGLE =====
+function buildTriangle(total, colors) {
+  let count = 0;
+  let output = "";
+
+  for (let row = 1; row <= 100; row++) {
+    let line = "";
+
+    for (let col = 0; col < row; col++) {
+      if (count >= total) break;
+
+      const weekIndex = Math.floor(count / 7);
+      const color = colors[weekIndex];
+
+      line += `<span style="color:${color}">O</span>`;
+      if ((count + 1) % 7 === 0) line += " ";
+
+      count++;
+    }
+
+    if (!line) break;
+    output += line + "<br>";
+  }
+
+  return output;
+}
+
+// ===== DIAMOND =====
+function buildDiamond(total, colors) {
+  let r = 0;
+  let points = [];
+
+  while (true) {
+    points = [];
+
+    for (let y = -r; y <= r; y++) {
+      for (let x = -r; x <= r; x++) {
+        if (Math.abs(x) + Math.abs(y) <= r) {
+          points.push({ x, y });
+        }
+      }
+    }
+
+    if (points.length >= total) break;
+    r++;
+  }
+
+  points.sort((a, b) => a.y - b.y || a.x - b.x);
+  points = points.slice(0, total);
+
+  let grid = {};
+  points.forEach((p, i) => {
+    grid[`${p.x},${p.y}`] = i;
+  });
+
+  let output = "";
+
+  for (let y = -r; y <= r; y++) {
+    let line = "";
+
+    for (let x = -r; x <= r; x++) {
+      let key = `${x},${y}`;
+
+      if (key in grid) {
+        let count = grid[key];
+        const weekIndex = Math.floor(count / 7);
+        const color = colors[weekIndex];
+
+        line += `<span style="color:${color}">O</span>`;
+        if ((count + 1) % 7 === 0) line += " ";
+      } else {
+        line += "&nbsp;";
+      }
+    }
+
+    if (line.trim()) output += line + "<br>";
+  }
+
+  return output;
+}
+
+// ===== SQUARE =====
+function buildSquare(total, colors) {
+  let size = Math.ceil(Math.sqrt(total));
+  let output = "";
+  let count = 0;
+
+  for (let y = 0; y < size; y++) {
+    let line = "";
+
+    for (let x = 0; x < size; x++) {
+      if (count < total) {
+        const weekIndex = Math.floor(count / 7);
+        const color = colors[weekIndex];
+
+        line += `<span style="color:${color}">O</span>`;
+        if ((count + 1) % 7 === 0) line += " ";
+
+        count++;
+      } else {
+        line += "&nbsp;";
+      }
+    }
+
+    output += line + "<br>";
+  }
+
+  return output;
+}
+
+render();
+setInterval(render, 1000 * 60 * 60);
+</script>
+
+</body>
+</html>

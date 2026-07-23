@@ -1,0 +1,105 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/png" href="/favicon.png"><link rel="stylesheet" href="https://unpkg.com/prismjs@1.20.0/themes/prism-okaidia.css"/><link rel="stylesheet" type="text/css" href="/static/css/tailwind.css"/><title>Run Local ELK Stack with Docker Compose</title></head><body class="m-0 p-0"><a name="top"></a><header class="site-header"><nav class="site-nav"><a href="/" class="site-logo">scalan.com</a> <input type="checkbox" id="menu-toggle" class="menu-toggle__input"/> <label for="menu-toggle" class="menu-toggle" aria-label="Open navigation menu"><span class="menu-toggle__bar"></span> <span class="menu-toggle__bar"></span> <span class="menu-toggle__bar"></span></label><ul class="site-menu"><li class="site-menu__item"><a href="/" class="site-menu__link">About</a></li><li class="site-menu__item"><a href="/projects" class="site-menu__link">Projects</a></li><li class="site-menu__item"><a href="/posts" class="site-menu__link">Posts</a></li><li class="site-menu__item"><a href="/contacts" class="site-menu__link">Contacts</a></li><li class="site-menu__item"><a href="/search" class="site-menu__link">Search</a></li></ul></nav></header><div class="content-wrapper"><main><div class="post-header"><h1>Run Local ELK Stack with Docker Compose</h1><div class="post-metadata"><span>06 Jul 2021</span> <span>AlexS</span></div></div><div class="post-tags"><a href="/posts/tags/bash/">bash</a> <a href="/posts/tags/linux/">linux</a> <a href="/posts/tags/docker/">docker</a> <a href="/posts/tags/devops/">DevOps</a></div><div class="post-page"><p>Setting up a local Elasticsearch cluster for development is essential for testing search APIs, debugging indexing pipelines, or prototyping Kibana dashboards — without touching production data. Docker Compose makes it possible to launch a multi-node Elasticsearch cluster with Kibana in a single command.</p><p>This guide shows you how to spin up a 3-node Elasticsearch cluster with Kibana locally and manage indices and documents via the REST API.</p><hr><h2>Why Run ELK Locally?</h2><ul><li><strong>Safe experimentation</strong> — test index mappings, queries, and aggregations without risking production</li><li><strong>Dashboard prototyping</strong> — build and iterate on Kibana visualizations before deploying to staging</li><li><strong>API development</strong> — validate your application's Elasticsearch client integration end-to-end</li><li><strong>Zero infrastructure cost</strong> — runs entirely on your laptop with bounded resource usage</li></ul><hr><h2>Setup</h2><p>Create a <code>docker-compose.yml</code> file that defines 3 Elasticsearch nodes and 1 Kibana instance:</p><pre class="language-yaml"><code class="language-yaml"><span class="token key atrule">version</span><span class="token punctuation">:</span> <span class="token string">"2.2"</span>
+<span class="token key atrule">services</span><span class="token punctuation">:</span>
+  <span class="token key atrule">es01</span><span class="token punctuation">:</span>
+    <span class="token key atrule">image</span><span class="token punctuation">:</span> docker.elastic.co/elasticsearch/elasticsearch<span class="token punctuation">:</span>8.12.0
+    <span class="token key atrule">container_name</span><span class="token punctuation">:</span> es01
+    <span class="token key atrule">environment</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> node.name=es01
+      <span class="token punctuation">-</span> cluster.name=es<span class="token punctuation">-</span>docker<span class="token punctuation">-</span>cluster
+      <span class="token punctuation">-</span> discovery.seed_hosts=es02<span class="token punctuation">,</span>es03
+      <span class="token punctuation">-</span> cluster.initial_master_nodes=es01<span class="token punctuation">,</span>es02<span class="token punctuation">,</span>es03
+      <span class="token punctuation">-</span> bootstrap.memory_lock=true
+      <span class="token punctuation">-</span> <span class="token string">"ES_JAVA_OPTS=-Xms512m -Xmx512m"</span>
+      <span class="token punctuation">-</span> xpack.security.enabled=false
+    <span class="token key atrule">ulimits</span><span class="token punctuation">:</span>
+      <span class="token key atrule">memlock</span><span class="token punctuation">:</span>
+        <span class="token key atrule">soft</span><span class="token punctuation">:</span> <span class="token number">-1</span>
+        <span class="token key atrule">hard</span><span class="token punctuation">:</span> <span class="token number">-1</span>
+    <span class="token key atrule">volumes</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> data01<span class="token punctuation">:</span>/usr/share/elasticsearch/data
+    <span class="token key atrule">ports</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> 9200<span class="token punctuation">:</span><span class="token number">9200</span>
+    <span class="token key atrule">networks</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> elastic
+
+  <span class="token key atrule">es02</span><span class="token punctuation">:</span>
+    <span class="token key atrule">image</span><span class="token punctuation">:</span> docker.elastic.co/elasticsearch/elasticsearch<span class="token punctuation">:</span>8.12.0
+    <span class="token key atrule">container_name</span><span class="token punctuation">:</span> es02
+    <span class="token key atrule">environment</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> node.name=es02
+      <span class="token punctuation">-</span> cluster.name=es<span class="token punctuation">-</span>docker<span class="token punctuation">-</span>cluster
+      <span class="token punctuation">-</span> discovery.seed_hosts=es01<span class="token punctuation">,</span>es03
+      <span class="token punctuation">-</span> cluster.initial_master_nodes=es01<span class="token punctuation">,</span>es02<span class="token punctuation">,</span>es03
+      <span class="token punctuation">-</span> bootstrap.memory_lock=true
+      <span class="token punctuation">-</span> <span class="token string">"ES_JAVA_OPTS=-Xms512m -Xmx512m"</span>
+      <span class="token punctuation">-</span> xpack.security.enabled=false
+    <span class="token key atrule">ulimits</span><span class="token punctuation">:</span>
+      <span class="token key atrule">memlock</span><span class="token punctuation">:</span>
+        <span class="token key atrule">soft</span><span class="token punctuation">:</span> <span class="token number">-1</span>
+        <span class="token key atrule">hard</span><span class="token punctuation">:</span> <span class="token number">-1</span>
+    <span class="token key atrule">volumes</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> data02<span class="token punctuation">:</span>/usr/share/elasticsearch/data
+    <span class="token key atrule">networks</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> elastic
+
+  <span class="token key atrule">es03</span><span class="token punctuation">:</span>
+    <span class="token key atrule">image</span><span class="token punctuation">:</span> docker.elastic.co/elasticsearch/elasticsearch<span class="token punctuation">:</span>8.12.0
+    <span class="token key atrule">container_name</span><span class="token punctuation">:</span> es03
+    <span class="token key atrule">environment</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> node.name=es03
+      <span class="token punctuation">-</span> cluster.name=es<span class="token punctuation">-</span>docker<span class="token punctuation">-</span>cluster
+      <span class="token punctuation">-</span> discovery.seed_hosts=es01<span class="token punctuation">,</span>es02
+      <span class="token punctuation">-</span> cluster.initial_master_nodes=es01<span class="token punctuation">,</span>es02<span class="token punctuation">,</span>es03
+      <span class="token punctuation">-</span> bootstrap.memory_lock=true
+      <span class="token punctuation">-</span> <span class="token string">"ES_JAVA_OPTS=-Xms512m -Xmx512m"</span>
+      <span class="token punctuation">-</span> xpack.security.enabled=false
+    <span class="token key atrule">ulimits</span><span class="token punctuation">:</span>
+      <span class="token key atrule">memlock</span><span class="token punctuation">:</span>
+        <span class="token key atrule">soft</span><span class="token punctuation">:</span> <span class="token number">-1</span>
+        <span class="token key atrule">hard</span><span class="token punctuation">:</span> <span class="token number">-1</span>
+    <span class="token key atrule">volumes</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> data03<span class="token punctuation">:</span>/usr/share/elasticsearch/data
+    <span class="token key atrule">networks</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> elastic
+
+  <span class="token key atrule">kib01</span><span class="token punctuation">:</span>
+    <span class="token key atrule">image</span><span class="token punctuation">:</span> docker.elastic.co/kibana/kibana<span class="token punctuation">:</span>8.12.0
+    <span class="token key atrule">container_name</span><span class="token punctuation">:</span> kib01
+    <span class="token key atrule">ports</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> 5601<span class="token punctuation">:</span><span class="token number">5601</span>
+    <span class="token key atrule">environment</span><span class="token punctuation">:</span>
+      <span class="token key atrule">ELASTICSEARCH_HOSTS</span><span class="token punctuation">:</span> http<span class="token punctuation">:</span>//es01<span class="token punctuation">:</span><span class="token number">9200</span>
+    <span class="token key atrule">networks</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> elastic
+
+<span class="token key atrule">volumes</span><span class="token punctuation">:</span>
+  <span class="token key atrule">data01</span><span class="token punctuation">:</span>
+  <span class="token key atrule">data02</span><span class="token punctuation">:</span>
+  <span class="token key atrule">data03</span><span class="token punctuation">:</span>
+
+<span class="token key atrule">networks</span><span class="token punctuation">:</span>
+  <span class="token key atrule">elastic</span><span class="token punctuation">:</span>
+    <span class="token key atrule">driver</span><span class="token punctuation">:</span> bridge</code></pre><blockquote><p><strong>Note:</strong> <code>xpack.security.enabled=false</code> disables authentication for local development. Never use this in production.</p></blockquote><hr><h2>Start the Stack</h2><p>Launch all containers in detached mode:</p><pre class="language-bash"><code class="language-bash"><span class="token function">docker-compose</span> up <span class="token parameter variable">-d</span></code></pre><p>Verify Kibana is running by opening <strong><a href="http://localhost:5601">http://localhost:5601</a></strong> in your browser.</p><hr><h2>Stop and Clean Up</h2><p>Shut down the stack and remove containers (volumes are preserved):</p><pre class="language-bash"><code class="language-bash"><span class="token function">docker-compose</span> down</code></pre><p>To also delete the data volumes and start fresh:</p><pre class="language-bash"><code class="language-bash"><span class="token function">docker-compose</span> down <span class="token parameter variable">-v</span></code></pre><hr><h2>Essential Elasticsearch Commands</h2><h3>Check Cluster Health</h3><pre class="language-bash"><code class="language-bash"><span class="token function">curl</span> http://localhost:9200/_cluster/health?pretty</code></pre><p>A healthy 3-node cluster reports <code>status: &quot;green&quot;</code> with all shards assigned.</p><h3>List Nodes</h3><pre class="language-bash"><code class="language-bash"><span class="token function">curl</span> <span class="token string">"http://localhost:9200/_cat/nodes?v"</span></code></pre><p>Shows IP, heap usage, CPU load, and master node (<code>*</code>) for each cluster member.</p><h3>List Indices</h3><pre class="language-bash"><code class="language-bash"><span class="token function">curl</span> <span class="token string">"http://localhost:9200/_cat/indices?v"</span></code></pre><p>Displays health status, shard count, document count, and storage size per index.</p><hr><h2>Managing Documents with curl</h2><h3>Create an Index</h3><pre class="language-bash"><code class="language-bash"><span class="token function">curl</span> <span class="token parameter variable">-X</span> PUT <span class="token string">"http://localhost:9200/products?pretty"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-H</span> <span class="token string">"Content-Type: application/json"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-d</span> <span class="token string">'{
+    "settings": {
+      "number_of_shards": 2,
+      "number_of_replicas": 1
+    }
+  }'</span></code></pre><h3>Insert a Document (Auto-ID)</h3><pre class="language-bash"><code class="language-bash"><span class="token function">curl</span> <span class="token parameter variable">-X</span> POST <span class="token string">"http://localhost:9200/products/_doc?pretty"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-H</span> <span class="token string">"Content-Type: application/json"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-d</span> <span class="token string">'{
+    "name": "Product1",
+    "price": 10
+  }'</span></code></pre><h3>Insert or Replace Document (Custom ID)</h3><pre class="language-bash"><code class="language-bash"><span class="token function">curl</span> <span class="token parameter variable">-X</span> PUT <span class="token string">"http://localhost:9200/products/_doc/p200?pretty"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-H</span> <span class="token string">"Content-Type: application/json"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-d</span> <span class="token string">'{
+    "name": "Product2",
+    "price": 15
+  }'</span></code></pre><h3>Get Document by ID</h3><pre class="language-bash"><code class="language-bash"><span class="token function">curl</span> <span class="token string">"http://localhost:9200/products/_doc/p200?pretty"</span></code></pre><h3>Update a Field (Partial Update)</h3><pre class="language-bash"><code class="language-bash"><span class="token function">curl</span> <span class="token parameter variable">-X</span> POST <span class="token string">"http://localhost:9200/products/_update/p200?pretty"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-H</span> <span class="token string">"Content-Type: application/json"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-d</span> <span class="token string">'{
+    "doc": {
+      "price": 19
+    }
+  }'</span></code></pre><h3>Delete a Document</h3><pre class="language-bash"><code class="language-bash"><span class="token function">curl</span> <span class="token parameter variable">-X</span> DELETE <span class="token string">"http://localhost:9200/products/_doc/p200?pretty"</span></code></pre><h3>Delete an Entire Index</h3><pre class="language-bash"><code class="language-bash"><span class="token function">curl</span> <span class="token parameter variable">-X</span> DELETE <span class="token string">"http://localhost:9200/products?pretty"</span></code></pre><blockquote><p><strong>Tip:</strong> Append <code>?pretty</code> to any request for formatted JSON output that's easy to read in the terminal.</p></blockquote><hr><h2>How It Works</h2><ol><li><strong>Docker Compose</strong> starts 3 Elasticsearch containers on a shared <code>elastic</code> bridge network</li><li><strong>Node discovery</strong> — each node connects via <code>discovery.seed_hosts</code> and forms a cluster led by the elected master</li><li><strong>Data persistence</strong> — named volumes (<code>data01</code>, <code>data02</code>, <code>data03</code>) survive container restarts</li><li><strong>Kibana</strong> connects to <code>es01:9200</code> and provides a web UI for exploring indices and building dashboards</li></ol><hr><h2>Customization Tips</h2><ul><li><strong>Adjust memory</strong> — change <code>-Xms512m -Xmx512m</code> based on your laptop's available RAM (1-2 GB per node is reasonable)</li><li><strong>Add Logstash</strong> — include a <code>logstash</code> service in the compose file for data ingestion pipelines</li><li><strong>Enable security</strong> — remove <code>xpack.security.enabled=false</code> and set up <code>ELASTICSEARCH_PASSWORD</code> for local auth testing</li><li><strong>Reset cluster</strong> — run <code>docker-compose down -v</code> to wipe all data and start from scratch</li></ul><hr><p>A full search engine cluster on your laptop in one command. Spin it up, experiment freely, tear it down when done.</p></div></main><aside class="sidebar"><h2>Latest Posts</h2><ul><li><a href="/posts/deploy-current-app-to-gitpages/">Deploy current app t...</a> <small>14 Jul 2026</small></li><li><a href="/posts/alternative-js-logging/">Alternative JS Loggi...</a> <small>29 Jan 2025</small></li><li><a href="/posts/configure-htaccess-for-react-app/">Configure .htaccess ...</a> <small>16 Dec 2024</small></li><li><a href="/posts/junit-test-with-json/">JUnit Parameterized ...</a> <small>27 Sep 2024</small></li><li><a href="/posts/set-attributes/">Set All Directories ...</a> <small>27 Sep 2024</small></li><li><a href="/posts/setup-ftp-server/">Setup FTP Server on ...</a> <small>27 Sep 2024</small></li><li><a href="/posts/autoformat-java-maven/">Auto-Format Java Sou...</a> <small>07 Sep 2024</small></li><li><a href="/posts/autoformat-java-gradle/">Auto-Format Java Sou...</a> <small>06 Sep 2024</small></li><li><a href="/posts/disable-unwanted-task-gradle/">Disable Unwanted Tas...</a> <small>08 May 2024</small></li><li><a href="/posts/delete-old-files-in-the-temp-dir/">Clean Up Old Files i...</a> <small>15 Sep 2023</small></li></ul></aside></div><hr><footer class="site-footer"><span title="Thursday, July 23, 2026 at 08:52 PM">2026</span> © ScAlAn. | Back to the <a href="#top">top</a>.</footer></body></html>

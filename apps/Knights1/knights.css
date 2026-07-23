@@ -1,0 +1,35 @@
+.board {
+    border: 10px solid #55cdef;
+    width: 320px;
+    height: 320px;
+}
+.square {
+    float: left;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.black {
+    background-color: #999;
+}
+.white {
+    background-color: #eee;
+}
+.stone {
+    background-color: #000;
+}
+.water {
+    background-color: #00F;
+}
+.grass {
+    background-color: #0F0;
+}
+.figure {
+    font-size: 40px;
+}
+.button {
+    font-size: 40px;
+    cursor: pointer;
+}

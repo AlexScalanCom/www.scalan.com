@@ -1,0 +1,11 @@
+{
+  "name": "WebClock",
+  "short_name": "WebClock",
+  "start_url": "https://scalan.com/apps/clock/index.html",
+  "display": "fullscreen",
+  "icons": [{
+    "src": "images/logo.png",
+    "sizes": "512x512",
+    "type": "image/png"
+  }]
+}
