@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <title>WebClock</title>
+        <link rel="manifest" href="./manifest.json">
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body,
+            html {
+                width: 100%;
+                height: 100%;
+            }
+
+            body {
+                background: #000;
+                color: #fff;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-direction: column;
+                text-align: center;
+                font-family: Arial, Helvetica, sans-serif;
+                overflow: hidden;
+            }
+
+            .weekBar {
+                width: 96%;
+                display: flex;
+                margin-bottom: 1vh;
+            }
+
+            .weekDay {
+                flex: 1;
+                margin-left: 2px;
+                margin-right: 2px;
+                background: #555;
+                color: #AAA;
+                text-align: center;
+                border-radius: 3px;
+                overflow: hidden;
+            }
+
+            .weekDay.weekend {
+                background: #5A3838;
+                color: #C09090;
+            }
+
+            .weekDayName {
+                display: block;
+                font-size: 16px;
+                line-height: 1.4;
+                white-space: nowrap;
+            }
+
+            .weekDayIndicator {
+                display: block;
+                height: 10px;
+                background: #666;
+            }
+
+            .weekDay.weekend .weekDayIndicator {
+                background: #704444;
+            }
+
+            .weekDay.current {
+                background: #888;
+                color: #FFF;
+            }
+
+            .weekDay.current .weekDayIndicator {
+                background: #FFF;
+            }
+
+            .weekDay.current.weekend {
+                background: #A05050;
+                color: #FFF;
+            }
+
+            .weekDay.current.weekend .weekDayIndicator {
+                background: #FF8888;
+            }
+
+            .clockDate {
+                color: #AAA;
+                display: flex;
+                position: relative;
+                white-space: nowrap;
+                line-height: 1.1;
+            }
+
+            .clockTime {
+                color: #FFF;
+                display: flex;
+                position: relative;
+                white-space: nowrap;
+                line-height: 1.0;
+                font-family: monospace, monospace;
+            }
+
+        </style>
+    </head>
+    <body>
+
+        <div class="weekBar">
+            <div class="weekDay" data-day="1">
+                <span class="weekDayName">Mon</span>
+                <span class="weekDayIndicator"></span>
+            </div>
+
+            <div class="weekDay" data-day="2">
+                <span class="weekDayName">Tue</span>
+                <span class="weekDayIndicator"></span>
+            </div>
+
+            <div class="weekDay" data-day="3">
+                <span class="weekDayName">Wed</span>
+                <span class="weekDayIndicator"></span>
+            </div>
+
+            <div class="weekDay" data-day="4">
+                <span class="weekDayName">Thu</span>
+                <span class="weekDayIndicator"></span>
+            </div>
+
+            <div class="weekDay" data-day="5">
+                <span class="weekDayName">Fri</span>
+                <span class="weekDayIndicator"></span>
+            </div>
+
+            <div class="weekDay weekend" data-day="6">
+                <span class="weekDayName">Sat</span>
+                <span class="weekDayIndicator"></span>
+            </div>
+
+            <div class="weekDay weekend" data-day="0">
+                <span class="weekDayName">Sun</span>
+                <span class="weekDayIndicator"></span>
+            </div>
+        </div>
+
+        <p class="clockDate">
+            <span id="year">0000</span>/
+            <span id="month">00</span>/
+            <span id="day">00</span>
+        </p>
+
+        <p class="clockTime">
+            <span id="hours">00</span>
+            <span id="divider">:</span>
+            <span id="minutes">00</span>
+        </p>
+
+        <script>
+
+            var dateElement = document.querySelector(".clockDate");
+            var timeElement = document.querySelector(".clockTime");
+            var weekDayElements = document.querySelectorAll(".weekDay");
+            var yearElement = document.getElementById("year");
+            var monthElement = document.getElementById("month");
+            var dayElement = document.getElementById("day");
+            var hoursElement = document.getElementById("hours");
+            var minutesElement = document.getElementById("minutes");
+            var dividerElement = document.getElementById("divider");
+
+            function updateWeekBar(dayOfWeek) {
+                var i;
+                for (i = 0; i < weekDayElements.length; i++) {
+                    weekDayElements[i].className = "weekDay";
+                    var dayNumber = parseInt(weekDayElements[i].getAttribute("data-day"), 10);
+                    if (dayNumber === 0 || dayNumber === 6) {
+                        weekDayElements[i].className += " weekend";
+                    }
+                }
+
+                for (i = 0; i < weekDayElements.length; i++) {
+                    var currentDay = parseInt(weekDayElements[i].getAttribute("data-day"), 10);
+                    if (currentDay === dayOfWeek) {
+                        weekDayElements[i].className += " current";
+                        break;
+                    }
+                }
+            }
+
+            function getViewportWidth() {
+                var width = document.documentElement.clientWidth;
+                if (!width) {
+                    width = document.body.clientWidth;
+                }
+                return width;
+            }
+
+            function getTextWidth(element) {
+                var clone = element.cloneNode(true);
+                clone.style.position = "absolute";
+                clone.style.visibility = "hidden";
+                clone.style.width = "auto";
+                clone.style.height = "auto";
+                clone.style.left = "0";
+                clone.style.top = "0";
+                document
+                    .body
+                    .appendChild(clone);
+                var width = clone.offsetWidth;
+                document
+                    .body
+                    .removeChild(clone);
+                return width;
+            }
+
+            function fitElementToWidth(element, maxFontSize, minFontSize) {
+                var viewportWidth = getViewportWidth();
+                var targetWidth = viewportWidth * 0.96;
+                var fontSize = maxFontSize;
+                element.style.fontSize = fontSize + "px";
+                var textWidth = getTextWidth(element);
+
+                if (textWidth > targetWidth && textWidth > 0) {
+                    fontSize = fontSize * targetWidth / textWidth;
+                    element.style.fontSize = fontSize + "px";
+                }
+
+                if (fontSize < minFontSize) {
+                    fontSize = minFontSize;
+                    element.style.fontSize = fontSize + "px";
+                }
+
+                textWidth = getTextWidth(element);
+                if (textWidth > targetWidth && textWidth > 0) {
+                    fontSize = fontSize * targetWidth / textWidth;
+                    element.style.fontSize = fontSize + "px";
+                }
+            }
+
+            function resizeClock() {
+                fitElementToWidth(dateElement, 180, 20);
+                fitElementToWidth(timeElement, 300, 30);
+            }
+
+            function myTimer() {
+                var dt = new Date();
+                var seconds = dt.getSeconds();
+                var minutes = dt.getMinutes();
+                var hours = dt.getHours();
+                var year = dt.getFullYear();
+                var month = dt.getMonth() + 1;
+                var day = dt.getDate();
+                var dayOfWeek = dt.getDay();
+
+                updateWeekBar(dayOfWeek);
+
+                yearElement.textContent = year;
+
+                if (month < 10) {
+                    monthElement.textContent = "0" + month;
+                } else {
+                    monthElement.textContent = month;
+                }
+                if (day < 10) {
+                    dayElement.textContent = "0" + day;
+                } else {
+                    dayElement.textContent = day;
+                }
+
+                if (hours < 10) {
+                    hoursElement.textContent = "0" + hours;
+                } else {
+                    hoursElement.textContent = hours;
+                }
+                if (minutes < 10) {
+                    minutesElement.textContent = "0" + minutes;
+                } else {
+                    minutesElement.textContent = minutes;
+                }
+
+                if (seconds % 2 === 0) {
+                    dividerElement.textContent = ":";
+                } else {
+                    dividerElement.innerHTML = "&nbsp;";
+                }
+            }
+
+            function clockLoop() {
+                myTimer();
+                var now = new Date();
+                var delay = 1000 - now.getMilliseconds();
+                if (delay < 10) {
+                    delay = 10;
+                }
+                setTimeout(clockLoop, delay);
+            }
+
+            window.onresize = function () {
+                resizeClock();
+            };
+
+            resizeClock();
+            clockLoop();
+        </script>
+
+    </body>
+</html>
